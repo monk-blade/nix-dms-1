@@ -1,25 +1,45 @@
 # NixOS flake + Disko + DankMaterialShell (VMware guest)
 
-This repository contains a basic flake setup for a NixOS VMware guest with:
+Basic NixOS flake for a VMware guest with:
 
-- Disko for partitioning/formatting
-- DankMaterialShell NixOS module
-- A niri-first Wayland stack (niri + greetd)
+- Disko-based partitioning and formatting
+- DankMaterialShell as a NixOS module
+- niri-first Wayland session with greetd
 
-## Files
+## Project layout
 
 - `flake.nix`: flake inputs and `nixosConfigurations.vmware`
-- `hosts/vmware/configuration.nix`: host config (VMware guest + DMS)
-- `hosts/vmware/disko.nix`: Disko layout (`/dev/sda`, EFI + ext4 root)
+- `hosts/vmware/configuration.nix`: host settings (VMware, niri, DMS, packages)
+- `hosts/vmware/disko.nix`: disk layout (EFI + ext4 root)
+- `init.sh`: one-command install helper for live ISO
 
-## Install from NixOS ISO in VMware
+## Quick install (recommended)
 
-1. Boot the VM with NixOS ISO and get shell access.
-2. Clone this repo:
+From NixOS live ISO shell:
 
 ```bash
-git clone <your-repo-url> /mnt/nix-dms
-cd /mnt/nix-dms
+git clone https://github.com/monk-blade/nix-dms-1
+cd nix-dms-1
+chmod +x ./init.sh
+sudo ./init.sh --host vmware --disk /dev/sda
+sudo reboot
+```
+
+Install helper options:
+
+- `--host <name>`: flake host (default: `vmware`)
+- `--disk <path>`: target disk (default: `/dev/sda`)
+- `--flake <path>`: flake directory (default: script directory)
+- `-y` or `--yes`: skip destructive confirmation
+
+## Manual install
+
+1. Boot VM with NixOS ISO and open a shell.
+2. Clone repository:
+
+```bash
+git clone https://github.com/monk-blade/nix-dms-1
+cd nix-dms-1
 ```
 
 3. Partition and format using Disko:
@@ -30,7 +50,7 @@ sudo nix --experimental-features "nix-command flakes" \
   --mode disko ./hosts/vmware/disko.nix
 ```
 
-4. Install NixOS from the flake:
+4. Install from flake:
 
 ```bash
 sudo nixos-install --flake .#vmware
@@ -42,64 +62,52 @@ sudo nixos-install --flake .#vmware
 sudo reboot
 ```
 
-## One-command install
+## First boot
 
-From the repo root on the NixOS ISO:
-
-```bash
-chmod +x ./init.sh
-sudo ./init.sh --host vmware --disk /dev/sda
-```
-
-Optional flags:
-
-- `--host <name>`: flake host (default: `vmware`)
-- `--disk <path>`: target disk (default: `/dev/sda`)
-- `--flake <path>`: flake directory (default: script directory)
-- `-y` / `--yes`: skip confirmation prompt
-
-## Modify and rebuild after install
-
-On the installed OS:
-
-1. Clone this repo (or your fork) to your user home:
-
-```bash
-git clone <your-repo-url> ~/nix-dms
-cd ~/nix-dms
-```
-
-2. Edit your config:
-
-```bash
-nano ./hosts/vmware/configuration.nix
-```
-
-3. Rebuild and apply immediately:
-
-```bash
-sudo nixos-rebuild switch --flake .#vmware
-```
-
-
-## After first boot
-
-- Log in with user `nix` and password `1121`.
-- Change the password immediately:
+- Login user: `nix`
+- Initial password: `1121`
+- Change password immediately:
 
 ```bash
 passwd
 ```
 
-- The greeter launches `niri-session`, and DMS auto-start is handled by its systemd service.
+The greeter launches `niri-session`, and DMS auto-start is handled by systemd.
+
+## Modify and rebuild on installed OS
+
+Clone to the installed system and apply changes iteratively:
+
+```bash
+git clone https://github.com/monk-blade/nix-dms-1 ~/nix-dms
+cd ~/nix-dms
+nano ./hosts/vmware/configuration.nix
+sudo nixos-rebuild switch --flake .#vmware
+```
+
+Common commands:
+
+```bash
+# Build only (no activation)
+nix build .#nixosConfigurations.vmware.config.system.build.toplevel
+
+# Activate for current boot only
+sudo nixos-rebuild test --flake .#vmware
+
+# Activate on next reboot
+sudo nixos-rebuild boot --flake .#vmware
+
+# Update flake.lock
+nix flake update
+```
 
 ## Notes
 
-- This config assumes the VMware virtual disk is `/dev/sda`.
-- If your VM disk appears as `/dev/nvme0n1` or `/dev/vda`, update `hosts/vmware/disko.nix`.
-- This setup is niri-first and does not install Plasma/SDDM.
-- The config pins `programs.dank-material-shell.quickshell.package = pkgs.quickshell` to avoid heavyweight Quickshell source builds on small VMs.
-- You can switch to unstable DMS by changing the input to:
+- Default disk in this repo is `/dev/sda`.
+- If your VM uses `/dev/nvme0n1` or `/dev/vda`, adjust `hosts/vmware/disko.nix` or pass `--disk` to `init.sh`.
+- This profile is niri-first and does not install Plasma or SDDM.
+- Quickshell is pinned to `pkgs.quickshell` to avoid heavy source builds on low-resource VMs.
+- To use unstable DMS, set this in `flake.nix`:
 
 ```nix
 dms.url = "github:AvengeMedia/DankMaterialShell";
