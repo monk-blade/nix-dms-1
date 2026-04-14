@@ -46,6 +46,7 @@
     enable = true;
     enableSystemMonitoring = true;
     systemd.enable = true;
+    quickshell.package = pkgs.quickshell;
   };
 
   environment.systemPackages = with pkgs; [

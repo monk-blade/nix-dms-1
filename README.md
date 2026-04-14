@@ -58,6 +58,7 @@ passwd
 - This config assumes the VMware virtual disk is `/dev/sda`.
 - If your VM disk appears as `/dev/nvme0n1` or `/dev/vda`, update `hosts/vmware/disko.nix`.
 - This setup is niri-first and does not install Plasma/SDDM.
+- The config pins `programs.dank-material-shell.quickshell.package = pkgs.quickshell` to avoid heavyweight Quickshell source builds on small VMs.
 - You can switch to unstable DMS by changing the input to:
 
 ```nix
