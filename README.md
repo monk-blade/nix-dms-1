@@ -58,6 +58,30 @@ Optional flags:
 - `--flake <path>`: flake directory (default: script directory)
 - `-y` / `--yes`: skip confirmation prompt
 
+## Modify and rebuild after install
+
+On the installed OS:
+
+1. Clone this repo (or your fork) to your user home:
+
+```bash
+git clone <your-repo-url> ~/nix-dms
+cd ~/nix-dms
+```
+
+2. Edit your config:
+
+```bash
+nano ./hosts/vmware/configuration.nix
+```
+
+3. Rebuild and apply immediately:
+
+```bash
+sudo nixos-rebuild switch --flake .#vmware
+```
+
+
 ## After first boot
 
 - Log in with user `nix` and password `1121`.
