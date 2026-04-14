@@ -5,7 +5,7 @@
   # Keep this in sync with the version used at first install.
   system.stateVersion = "26.05";
 
-  time.timeZone = "UTC";
+  time.timeZone = "Asia/Kolkata";
   i18n.defaultLocale = "en_US.UTF-8";
 
   boot.loader.systemd-boot.enable = true;
@@ -37,7 +37,7 @@
   users.users.nix = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
-    initialPassword = "changeme";
+    initialPassword = "1121"; # Change this after first login!
   };
 
   networking.networkmanager.enable = true;
@@ -45,15 +45,49 @@
   programs.dank-material-shell = {
     enable = true;
     enableSystemMonitoring = true;
-    systemd.enable = true;
+    
+    systemd = {
+      enable = true;             # Systemd service for auto-start
+      restartIfChanged = true;   # Auto-restart dms.service when dank-material-shell changes
+    };
+
     quickshell.package = pkgs.quickshell;
+    enableDynamicTheming = true;       # Wallpaper-based theming (matugen)
+    enableAudioWavelength = true;      # Audio visualizer (cava)
+    enableCalendarEvents = true;       # Calendar integration (khal)
+    enableClipboardPaste = true;       # Pasting items from the clipboard (wtype)
   };
 
   environment.systemPackages = with pkgs; [
+    ghostty
+
+    # Core tools
     git
     vim
+    nano
     wget
     curl
+    ripgrep
+    fd
+    jq
+
+    # Archive/compression helpers
+    unzip
+    zip
+    p7zip
+
+    # Monitoring and diagnostics
+    btop
+    fastfetch
+    pciutils
+    usbutils
+
+    # Wayland desktop utilities
+    wl-clipboard
+    grim
+    slurp
+    pavucontrol
+    playerctl
   ];
 
   services.openssh.enable = true;
