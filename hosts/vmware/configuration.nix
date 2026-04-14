@@ -91,7 +91,7 @@
   ];
 
   services.openssh.enable = true;
-  services.qemuGuest.enable = false;
+  # services.qemuGuest.enable = false;
 
   systemd.services.NetworkManager-wait-online.enable = false;
 }
