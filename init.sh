@@ -65,8 +65,16 @@ if [[ ! -f "$FLAKE_DIR/flake.nix" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$FLAKE_DIR/hosts/vmware/disko.nix" ]]; then
-  echo "Error: disko file not found at $FLAKE_DIR/hosts/vmware/disko.nix" >&2
+if ! nix eval --experimental-features "nix-command flakes" \
+  "$FLAKE_DIR#nixosConfigurations.${HOST}.config.system.stateVersion" >/dev/null 2>&1; then
+  echo "Error: host '$HOST' not found in flake nixosConfigurations." >&2
+  exit 1
+fi
+
+HOST_DISKO="$FLAKE_DIR/hosts/$HOST/disko.nix"
+
+if [[ ! -f "$HOST_DISKO" ]]; then
+  echo "Error: disko file not found at $HOST_DISKO" >&2
   exit 1
 fi
 
@@ -92,7 +100,7 @@ trap cleanup EXIT
 
 # Adjust disk device without mutating repository files.
 sed "s|device = \"/dev/sda\";|device = \"$DISK\";|" \
-  "$FLAKE_DIR/hosts/vmware/disko.nix" > "$TMP_DISKO"
+  "$HOST_DISKO" > "$TMP_DISKO"
 
 echo "==> Running Disko on $DISK"
 nix --experimental-features "nix-command flakes" \

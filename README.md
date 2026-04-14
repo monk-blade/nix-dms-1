@@ -1,16 +1,24 @@
 # NixOS flake + Disko + DankMaterialShell (VMware guest)
 
-Basic NixOS flake for a VMware guest with:
+Basic flake-parts NixOS setup with a dendritic modular layout and multi-host-ready structure:
 
 - Disko-based partitioning and formatting
 - DankMaterialShell as a NixOS module
 - niri-first Wayland session with greetd
+- host leaf modules + shared branch modules
 
 ## Project layout
 
-- `flake.nix`: flake inputs and `nixosConfigurations.vmware`
-- `hosts/vmware/configuration.nix`: host settings (VMware, niri, DMS, packages)
-- `hosts/vmware/disko.nix`: disk layout (EFI + ext4 root)
+- `flake.nix`: flake-parts root, host map, and `nixosConfigurations`
+- `modules/core/*`: boot, locale, networking, and nix settings
+- `modules/desktop/*`: niri/greetd/portal and DMS
+- `modules/services/*`: openssh and service tuning
+- `modules/users/*`: user definitions
+- `modules/packages/default.nix`: compact package set
+- `profiles/common.nix`: shared composition trunk
+- `profiles/vmware.nix`: vmware profile trunk
+- `hosts/vmware/configuration.nix`: vmware host leaf overrides
+- `hosts/vmware/disko.nix`: vmware disk layout leaf
 - `init.sh`: one-command install helper for live ISO
 
 ## Quick install (recommended)
@@ -81,6 +89,10 @@ Clone to the installed system and apply changes iteratively:
 ```bash
 git clone https://github.com/monk-blade/nix-dms-1 ~/nix-dms
 cd ~/nix-dms
+nano ./modules/packages/default.nix
+sudo nixos-rebuild switch --flake .#vmware
+
+# Host-specific overrides
 nano ./hosts/vmware/configuration.nix
 sudo nixos-rebuild switch --flake .#vmware
 ```
@@ -107,6 +119,7 @@ nix flake update
 - If your VM uses `/dev/nvme0n1` or `/dev/vda`, adjust `hosts/vmware/disko.nix` or pass `--disk` to `init.sh`.
 - This profile is niri-first and does not install Plasma or SDDM.
 - Quickshell is pinned to `pkgs.quickshell` to avoid heavy source builds on low-resource VMs.
+- To add another host, create `hosts/<name>/configuration.nix` and `hosts/<name>/disko.nix`, then add the host entry in `flake.nix` under `hosts`.
 - To use unstable DMS, set this in `flake.nix`:
 
 ```nix
