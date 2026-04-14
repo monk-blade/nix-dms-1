@@ -15,7 +15,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, disko, dms, ... }:
+  outputs = inputs@{ self, nixpkgs, disko, dms, ... }:
     let
       system = "x86_64-linux";
       lib = nixpkgs.lib;
