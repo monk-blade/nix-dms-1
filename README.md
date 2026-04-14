@@ -4,7 +4,7 @@ This repository contains a basic flake setup for a NixOS VMware guest with:
 
 - Disko for partitioning/formatting
 - DankMaterialShell NixOS module
-- A minimal desktop stack (Plasma 6 + SDDM)
+- A niri-first Wayland stack (niri + greetd)
 
 ## Files
 
@@ -51,10 +51,13 @@ sudo reboot
 passwd
 ```
 
+- The greeter launches `niri-session`, and DMS is set to auto-spawn under niri.
+
 ## Notes
 
 - This config assumes the VMware virtual disk is `/dev/sda`.
 - If your VM disk appears as `/dev/nvme0n1` or `/dev/vda`, update `hosts/vmware/disko.nix`.
+- This setup is niri-first and does not install Plasma/SDDM.
 - You can switch to unstable DMS by changing the input to:
 
 ```nix

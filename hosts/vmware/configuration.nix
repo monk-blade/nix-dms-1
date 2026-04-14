@@ -16,9 +16,23 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  # niri-first setup: Wayland compositor + lightweight login manager.
+  programs.niri.enable = true;
+
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd niri-session";
+        user = "greeter";
+      };
+    };
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
 
   users.users.nix = {
     isNormalUser = true;
@@ -31,6 +45,7 @@
   programs.dank-material-shell = {
     enable = true;
     enableSystemMonitoring = true;
+    niri.enableSpawn = true;
   };
 
   environment.systemPackages = with pkgs; [
