@@ -10,9 +10,9 @@ Basic flake-parts NixOS setup with a dendritic modular layout and multi-host-rea
 ## Project layout
 
 - `flake.nix`: flake-parts root, host map, and `nixosConfigurations`
-- `modules/core/*`: boot, locale, networking, and nix settings
+- `modules/core/default.nix`: boot, locale, networking, nix settings, and openssh
 - `modules/desktop/*`: niri/greetd/portal and DMS
-- `modules/services/*`: openssh and service tuning
+- `modules/services/default.nix`: service tuning
 - `modules/users/*`: user definitions
 - `modules/packages/default.nix`: compact package set
 - `profiles/common.nix`: shared composition trunk
