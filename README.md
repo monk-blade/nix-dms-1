@@ -42,9 +42,25 @@ sudo nixos-install --flake .#vmware
 sudo reboot
 ```
 
+## One-command install
+
+From the repo root on the NixOS ISO:
+
+```bash
+chmod +x ./init.sh
+sudo ./init.sh --host vmware --disk /dev/sda
+```
+
+Optional flags:
+
+- `--host <name>`: flake host (default: `vmware`)
+- `--disk <path>`: target disk (default: `/dev/sda`)
+- `--flake <path>`: flake directory (default: script directory)
+- `-y` / `--yes`: skip confirmation prompt
+
 ## After first boot
 
-- Log in with user `nix` and password `changeme`.
+- Log in with user `nix` and password `1121`.
 - Change the password immediately:
 
 ```bash
