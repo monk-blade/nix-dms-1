@@ -51,7 +51,7 @@ sudo reboot
 passwd
 ```
 
-- The greeter launches `niri-session`, and DMS is set to auto-spawn under niri.
+- The greeter launches `niri-session`, and DMS auto-start is handled by its systemd service.
 
 ## Notes
 
