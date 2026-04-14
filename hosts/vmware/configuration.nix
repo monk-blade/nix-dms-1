@@ -1,0 +1,47 @@
+{ config, pkgs, inputs, ... }:
+{
+  networking.hostName = "vmware";
+
+  # Keep this in sync with the version used at first install.
+  system.stateVersion = "26.05";
+
+  time.timeZone = "UTC";
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  # VMware guest integration.
+  virtualisation.vmware.guest.enable = true;
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  services.xserver.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
+
+  users.users.nix = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    initialPassword = "changeme";
+  };
+
+  networking.networkmanager.enable = true;
+
+  programs.dank-material-shell = {
+    enable = true;
+    enableSystemMonitoring = true;
+  };
+
+  environment.systemPackages = with pkgs; [
+    git
+    vim
+    wget
+    curl
+  ];
+
+  services.openssh.enable = true;
+  services.qemuGuest.enable = false;
+
+  systemd.services.NetworkManager-wait-online.enable = false;
+}
